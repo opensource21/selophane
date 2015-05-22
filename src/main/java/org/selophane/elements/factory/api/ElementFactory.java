@@ -19,50 +19,50 @@ public class ElementFactory {
     /**
      *  See {@link org.openqa.selenium.support.PageFactory#initElements(org.openqa.selenium.WebDriver driver, Class)}
      */
-    public static <T> T initElements(WebDriver driver, Class<T> pageClassToProxy) {
-        T page = instantiatePage(driver, pageClassToProxy);
-        return initElements(driver, page);
+    public static <T> T initElements(WebDriver driver, Class<T> containerClassToProxy) {
+        final T container = instantiatePage(driver, containerClassToProxy);
+        return initElements(driver, container);
     }
 
     /**
      * As
      * {@link ElementFactory#initElements(org.openqa.selenium.WebDriver, Class)}
-     * but will only replace the fields of an already instantiated Page Object.
+     * but will only replace the fields of an already instantiated container Object.
      * 
      * @param searchContext A search context that will be used to look up the elements
-     * @param page The object with WebElement and List<WebElement> fields that should be proxied.
-     * @return the initialized page-object.
+     * @param container The object with WebElement and List<WebElement> fields that should be proxied.
+     * @return the initialized container-object.
      */
-    public static <T> T initElements(SearchContext searchContext, T page) {
-        initElements(new ElementDecorator(new DefaultElementLocatorFactory(searchContext)), page);
-        return page;
+    public static <T> T initElements(SearchContext searchContext, T container) {
+        initElements(new ElementDecorator(new DefaultElementLocatorFactory(searchContext)), container);
+        return container;
     }
 
     /**
      * see {@link org.openqa.selenium.support.PageFactory#initElements(org.openqa.selenium.support.pagefactory.ElementLocatorFactory, Object)}
      */
-    public static void initElements(ElementLocatorFactory factory, Object page) {
+    public static void initElements(ElementLocatorFactory factory, Object container) {
         final ElementLocatorFactory factoryRef = factory;
-        initElements(new ElementDecorator(factoryRef), page);
+        initElements(new ElementDecorator(factoryRef), container);
     }
 
     /**
      * see {@link org.openqa.selenium.support.PageFactory#initElements(org.openqa.selenium.support.pagefactory.ElementLocatorFactory, Object)}
      */
-    public static void initElements(FieldDecorator decorator, Object page) {
-        PageFactory.initElements(decorator, page);
+    public static void initElements(FieldDecorator decorator, Object container) {
+        PageFactory.initElements(decorator, container);
     }
 
     /**
      * Copy of {@link org.openqa.selenium.support.PageFactory#instantiatePage(org.openqa.selenium.WebDriver, Class)}
      */
-    private static <T> T instantiatePage(WebDriver driver, Class<T> pageClassToProxy) {
+    private static <T> T instantiatePage(WebDriver driver, Class<T> containerClassToProxy) {
         try {
             try {
-                Constructor<T> constructor = pageClassToProxy.getConstructor(WebDriver.class);
+                Constructor<T> constructor = containerClassToProxy.getConstructor(WebDriver.class);
                 return constructor.newInstance(driver);
             } catch (NoSuchMethodException e) {
-                return pageClassToProxy.newInstance();
+                return containerClassToProxy.newInstance();
             }
         } catch (InstantiationException e) {
             throw new RuntimeException(e);
