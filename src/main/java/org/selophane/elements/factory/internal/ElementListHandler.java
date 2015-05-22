@@ -1,8 +1,6 @@
 package org.selophane.elements.factory.internal;
 
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.pagefactory.ElementLocator;
-import org.selophane.elements.base.Element;
+import static org.selophane.elements.factory.internal.ImplementedByProcessor.getWrapperClass;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
@@ -11,7 +9,10 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.selophane.elements.factory.internal.ImplementedByProcessor.getWrapperClass;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.pagefactory.ElementLocator;
+import org.selophane.elements.base.Element;
+import org.selophane.elements.base.Fragment;
 
 /**
  * Wraps a list of WebElements in multiple wrapped elements.
@@ -49,10 +50,24 @@ public class ElementListHandler implements InvocationHandler {
     @Override
     public Object invoke(Object o, Method method, Object[] objects) throws Throwable {
         List<Object> wrappedList = new ArrayList<Object>();
-        Constructor<?> cons = wrappingType.getConstructor(WebElement.class);
+        Constructor<?> cons;
+        if (Fragment.class.isAssignableFrom(wrappingType)) {
+            cons = wrappingType.getConstructor(WebElement.class, 
+                    ElementLocator.class, int.class);
+        } else {
+            cons = wrappingType.getConstructor(WebElement.class);
+        }
+
+        int index = 0;
         for (WebElement element : locator.findElements()) {
-            Object thing = cons.newInstance(element);
+            final Object thing;
+            if (Fragment.class.isAssignableFrom(wrappingType)) {
+                thing = cons.newInstance(element, locator, index);
+            } else {
+                thing = cons.newInstance(element);
+            }
             wrappedList.add(wrappingType.cast(thing));
+            index++;
         }
         try {
             return method.invoke(wrappedList, objects);

@@ -6,8 +6,8 @@ package org.selophane.elements.helpers;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.selophane.elements.base.ElementImpl;
-import org.selophane.elements.factory.api.ElementFactory;
+import org.openqa.selenium.support.pagefactory.ElementLocator;
+import org.selophane.elements.base.Fragment;
 import org.selophane.elements.widget.Select;
 
 /**
@@ -15,15 +15,17 @@ import org.selophane.elements.widget.Select;
  * @author niels
  *
  */
-public class SelectFragmentImpl extends ElementImpl implements SelectFragment {
+public class SelectFragmentImpl extends Fragment implements SelectFragment {
 
     
     @FindBy(id = "option1")
     private Select option1;
     
-    public SelectFragmentImpl(WebElement element) {
-        super(element);
-        ElementFactory.initElements(element, this);   
+
+
+    public SelectFragmentImpl(WebElement element,
+            ElementLocator elementLocator, int pos) {
+        super(element, elementLocator, pos);
     }
 
     @Override
